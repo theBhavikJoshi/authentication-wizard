@@ -1,6 +1,7 @@
 // Import Dependencies
 const mongoose = require('mongoose');
 const randomToken = require('random-token');
+const crypto = require('crypto');
 
 // Import Essential Functions
 const sendEmail = require('../handlers/mail');
@@ -25,11 +26,20 @@ exports.register = async (req, res) => {
     return res.status(500).send('Please provide a Password');
   }
 
+  // Hash password with sha512 digest
+  let hashedPassword = crypto.pbkdf2Sync(
+    req.body.password, // Plain text password
+    token, // Using token as a salt
+    1000, // Number of Iterations
+    64, // Key Length
+    'sha512' // Digest
+  ).toString('hex');
+
   // Try creating a DB entry for the user
   try {
     const user = await User.create({
       email: req.body.email,
-      password: req.body.password,
+      password: hashedPassword,
       token: token
     });
     // Configure mail options
