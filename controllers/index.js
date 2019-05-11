@@ -48,3 +48,26 @@ exports.register = async (req, res) => {
     res.status(500).json(e.message);
   }
 }
+
+exports.verifyEmail = async (req, res) => {
+  // Check if Token is present
+  if (!req.params.token) {
+    return res.status(400).send('Bad Request! No token present');
+  }
+  const token = req.params.token;
+  // Find and Update the user rekated to provided verification token
+  User.findOneAndUpdate({ token }, { isValidated: true })
+  .then(user => {
+    if (user) {
+      // return success response
+      res.status(200).send(`Verification Successful. You can login now! Email: ${user.email}`);
+    } else {
+      // return error response
+      return res.status(500).send('No user with this token found!');
+    }
+  })
+  .catch(err => {
+    // return error response
+    return res.status(500).send('Error!');
+  })
+}
