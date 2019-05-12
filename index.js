@@ -1,8 +1,14 @@
 // Import Dependencies
 const mongoose = require('mongoose');
 
+// Set ENV
+const dotenv = require('dotenv');
+dotenv.config();
+// Set default node environment to development
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 // Setup Mongoose
-mongoose.connect('mongodb://admin:authWizardPass123@ds149706.mlab.com:49706/auth-wizard');
+mongoose.connect(process.env.MONGODB_URI);
 mongoose.Promise = global.Promise; // Using ES6 Promises
 mongoose.connection.on('error', (err) => {
   console.error('Error Connecting to MongoDB');
@@ -10,10 +16,6 @@ mongoose.connection.on('error', (err) => {
 
 // Import Models, i.e. User Model
 require('./models/User');
-
-// Set ENV File
-const dotenv = require('dotenv');
-dotenv.config();
 
 // Import App
 const app = require('./app');

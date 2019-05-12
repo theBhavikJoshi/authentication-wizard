@@ -15,15 +15,19 @@ exports.hello = (req, res) => {
 };
 
 exports.register = async (req, res) => {
-  console.log('Data', req.body);
   // Generate a Token
   const token = randomToken(16);
   // Check if email and password are provided
-  if(!req.body.email) {
+  if (!req.body.email) {
     return res.status(500).send('Please provide an Email');
   }
-  if(!req.body.password) {
+  if (!req.body.password) {
     return res.status(500).send('Please provide a Password');
+  }
+  
+  // Check if Password is atleast 6 characters.
+  if (req.body.password.length < 6) {
+    return res.status(500).send('Password should be atleast 6 characters.');
   }
 
   // Hash password with sha512 digest
@@ -55,6 +59,13 @@ exports.register = async (req, res) => {
     res.status(200).json(req.body);
   } catch (e) {
     // return error response
+    if (e.name === 'ValidationError') {
+      // Email Validation Error
+      res.status(500).send('Please provide a valid email address.');
+    } else if (e.code === 11000) {
+      // Duplicate Email Provided
+      res.status(500).send('Email already registered. Please try logging in.');
+    }
     res.status(500).json(e.message);
   }
 }
@@ -83,7 +94,6 @@ exports.verifyEmail = (req, res) => {
 }
 
 exports.signIn = async (req, res) => {
-  console.log('Data', req.body);
   // Check if email and password are provided
   if(!req.body.email) {
     return res.status(500).send('Please provide an Email');
