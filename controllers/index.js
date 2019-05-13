@@ -61,12 +61,12 @@ exports.register = async (req, res) => {
     // return error response
     if (e.name === 'ValidationError') {
       // Email Validation Error
-      res.status(500).send('Please provide a valid email address.');
+      return res.status(500).send('Please provide a valid email address.');
     } else if (e.code === 11000) {
       // Duplicate Email Provided
-      res.status(500).send('Email already registered. Please try logging in.');
+      return res.status(500).send('Email already registered. Please try logging in.');
     }
-    res.status(500).json(e.message);
+    return res.status(500).json(e.message);
   }
 }
 
